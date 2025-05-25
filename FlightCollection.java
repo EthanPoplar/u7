@@ -1,136 +1,81 @@
-package fit5171.monash.edu;
+package assessment;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
-public class FlightCollection {
-	
-	public static ArrayList<Flight> flights = new ArrayList<>();
+class FlightCollection {
+	protected static final List<Flight> flights = new ArrayList<>();
 
-	public static ArrayList<Flight> getFlights() {
+	FlightCollection() {
+		throw new IllegalStateException("FlightCollection is a utility class and cannot be instantiated");
+	}
+
+	public static List<Flight> getFlights()
+	{
 		return flights;
 	}
 
-	public static void addFlights(ArrayList<Flight> newFlights) {
-		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-
-		if (newFlights == null) {
-			throw new IllegalArgumentException("flights cannot be null");
+	public static void addFlights(List<Flight> flights)
+	{
+		if (flights == null) {
+			throw new NullPointerException("Cannot add null flight list");
 		}
-
-		ArrayList<Flight> validFlights = new ArrayList<>();
-
-		for (Flight flight : newFlights) {
-			if (flight == null || flight.getDateFrom().before(currentTime)) {
-				continue;
-			}
-
-			boolean isDuplicate = false;
-
-			for (Flight validFlight : validFlights) {
-				if (validFlight.getFlightID() == flight.getFlightID()) {
-					isDuplicate = true;
-					break;
-				}
-			}
-			if (isDuplicate) {
-				continue;
-			}
-
-			for (Flight existFlight : flights) {
-				if (existFlight.getFlightID() == flight.getFlightID()) {
-					isDuplicate = true;
-					break;
-				}
-			}
-			if (!isDuplicate) {
-				validFlights.add(flight);
-			}
-		}
-
-		FlightCollection.flights.addAll(validFlights);
-	}
-	
-	public static Flight getFlightInfo(String city1, String city2) {
-//		removeAllDepartedFlights();
-		city1 = city1.trim().toLowerCase();
-		city2 = city2.trim().toLowerCase();
-
-		if (city1.isEmpty() || city2.isEmpty()) {
-			throw new IllegalArgumentException("City names cannot be empty");
-		}
-
-		if (city1.equals(city2)) {
-			throw new IllegalArgumentException("Departure and arrival cities cannot be the same");
-		}
-
-		if (!isValidCityName(city1) || !isValidCityName(city2)) {
-			throw new IllegalArgumentException("City name contains invalid characters");
-		}
-
-    	for (Flight flight : flights) {
-			if(flight.getDepartFrom().toLowerCase().equals(city1) && flight.getDepartTo().toLowerCase().equals(city2)) {
-				return flight;
-			}
-		}
-		return null;
-    }
-    
-    public static Flight getFlightInfo(String city) {
-//		removeAllDepartedFlights();
-
-		if (city == null || city.isEmpty()) {
-			throw new IllegalArgumentException("City name cannot be empty");
-		}
-
-		city = city.trim().toLowerCase();
-
-		if (!isValidCityName(city)) {
-			throw new IllegalArgumentException("City name contains invalid characters");
-		}
-
-		for (Flight flight : flights) {
-			System.out.println(flight.getDepartTo().toLowerCase() + " " +city  + " " + flight.getDepartTo().toLowerCase().equals(city));
-			if(flight.getDepartTo().toLowerCase().equals(city)) {
-				return flight;
-			}
-		}
-		return null;
-    }
-
-    public static Flight getFlightInfo(int flight_id) {
-		removeAllDepartedFlights();
-
-		if (flight_id < 0) {
-			throw new IllegalArgumentException("Flight ID cannot be negative");
-		}
-
-		for (Flight flight : flights) {
-			if(flight.getFlightID() == flight_id) {
-				return flight;
-			}
-		}
-    	throw new IllegalArgumentException("Flight not found.");
-    }
-
-	// helper function to check if city name is valid
-	private static boolean isValidCityName(String cityName) {
-		// City names should only contain letters, spaces, and hyphens
-		return cityName.matches("^[a-z\\s\\-]+$");
+		FlightCollection.flights.addAll(flights);
 	}
 
-	// helper function to remove all departed flights from flights list
-	private static void removeAllDepartedFlights() {
-		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-		Iterator<Flight> iterator = flights.iterator();
-		while (iterator.hasNext()) {
-			Flight flight = iterator.next();
-			if (flight.getDateFrom().before(currentTime)) {
-				iterator.remove();
+	public static void addFlight(Flight flight)
+	{
+		if (flight == null) {
+			throw new NullPointerException("Cannot add null flight list");
+		}
+		FlightCollection.flights.add(flight);
+	}
+
+	public static void clearFlights()
+	{
+		FlightCollection.flights.clear();
+	}
+
+	public static Flight getFlightInfo(String city1, String city2)
+	{
+		//display the flights where there is a direct flight from city 1 to city2
+		Flight flight = null;
+		for (Flight f : flights)
+		{
+			if (f.getDepartFrom().equals(city2) && f.getDepartTo().equals(city1))
+			{
+				flight = f;
 			}
 		}
+		return flight;
+	}
+
+	public static Flight getFlightInfo(String city)
+	{
+		//SELECT a flight where depart_to = city
+		Flight flight = null;
+		for (Flight f : flights)
+		{
+			if (f.getDepartTo().equals(city))
+			{
+				flight = f;
+			}
+		}
+		return flight;
+	}
+
+	public static Flight getFlightInfo(int flightID)
+	{
+		//SELECT a flight with a particular flight id
+		Flight flight =  null;
+
+		for (Flight f : flights)
+		{
+			if (f.getFlightID() == flightID)
+			{
+				flight = f;
+			}
+		}
+		return flight;
 	}
 }

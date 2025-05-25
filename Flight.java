@@ -1,8 +1,6 @@
-package fit5171.monash.edu;
+package assessment;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 public class Flight {
     private int flightID;
@@ -14,30 +12,48 @@ public class Flight {
     private Timestamp dateTo;
     Airplane airplane;
 
-    public Flight(int flight_id, String departTo, String departFrom, String code, String company, Timestamp dateFrom,Timestamp dateTo, Airplane airplane) throws ParseException {
-            setFlightID(flight_id);
-            setDepartTo(departTo);
-            setDepartFrom(departFrom);
-            setCode(code);
-            setCompany(company);
-            setAirplane(airplane);
-            setDateTo(dateTo);
-            setDateFrom(dateFrom);
+    public Flight(int flightId, String departTo, String departFrom, String code, String company, Timestamp dateFrom,Timestamp dateTo, Airplane airplane){
+        //check if flight exists in the system
+        if (!FlightCollection.getFlights().isEmpty())
+        {
+            for(Flight flight : FlightCollection.getFlights()) {
+                if (flightId == flight.getFlightID()) {
+                    throw new IllegalArgumentException("Flight Already in the system");
+                }
+            }
+        }
+
+        if (flightId == 0 || departFrom == null || departTo == null || code == null || company == null || airplane == null || dateFrom == null || dateTo == null)
+        {
+            throw new IllegalArgumentException("All fields are required");
+        }
+        setFlightID(flightId);
+        setDepartFrom(departFrom);
+        setDepartTo(departTo);
+        setCode(code);
+        setCompany(company);
+        setDateFrom(dateFrom);
+        setDateTo(dateTo);
+        setAirplane(airplane);
     }
 
-    public int getFlightID() {
+    public int getFlightID()
+    {
         return flightID;
     }
 
-    public void setFlightID(int flightid) {
-        this.flightID = flightid;
+    public void setFlightID(int flightId)
+    {
+        this.flightID = flightId;
     }
 
-    public String getDepartTo() {
+    public String getDepartTo()
+    {
         return departTo;
     }
 
-    public void setDepartTo(String departTo) {
+    public void setDepartTo(String departTo)
+    {
         if(departTo==null || departTo.isEmpty()) {
             throw new IllegalArgumentException("Depart city cannot be null");
         }
@@ -47,11 +63,13 @@ public class Flight {
         this.departTo = departTo;
     }
 
-    public String getDepartFrom() {
+    public String getDepartFrom()
+    {
         return departFrom;
     }
 
-    public void setDepartFrom(String departFrom) {
+    public void setDepartFrom(String departFrom)
+    {
         if(departFrom==null || departFrom.isEmpty()) {
             throw new IllegalArgumentException("Depart city cannot be null");
         }
@@ -62,52 +80,51 @@ public class Flight {
         this.departFrom = departFrom;
     }
 
-    public String getCode() {
+    public String getCode()
+    {
         return code;
     }
 
-    public void setCode(String code) {
+    public void setCode(String code)
+    {
         this.code = code;
     }
 
-    public String getCompany() {
+    public String getCompany()
+    {
         return company;
     }
 
-    public void setCompany(String company) {
+    public void setCompany(String company)
+    {
         this.company = company;
     }
 
-    public Timestamp getDateFrom() {
+    public Timestamp getDateFrom()
+    {
         return dateFrom;
     }
 
-    public void setDateFrom(Timestamp dateFrom) throws ParseException {
+    public void setDateFrom(Timestamp dateFrom) {
+        if(dateFrom == null) {
+            throw new IllegalArgumentException("Date cannot be null");
+        }
         checkTimeFormat(dateFrom);
         if(this.dateTo !=null && (this.dateTo.before(dateFrom) || this.dateTo.equals(dateFrom))){
-            throw new IllegalArgumentException("Date cannot be before or equal the date from");
+            throw new IllegalArgumentException("Date cannot be after or equal the date to");
         }
         this.dateFrom = dateFrom;
     }
 
-    private void checkTimeFormat(Timestamp date) throws ParseException {
-        if(date == null){
-            throw new IllegalArgumentException("Date cannot be null");
-        }
-        String inputDate = date.toString();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try{
-            format.parse(inputDate);
-        }catch (ParseException e){
-            throw new ParseException("Date must be in YYYY-MM-DD HH:MM:SS format.", 0);
-        }
-    }
-
-    public Timestamp getDateTo() {
+    public Timestamp getDateTo()
+    {
         return dateTo;
     }
 
-    public void setDateTo(Timestamp dateTo) throws ParseException {
+    public void setDateTo(Timestamp dateTo) {
+        if(dateTo == null) {
+            throw new IllegalArgumentException("Date cannot be null");
+        }
         checkTimeFormat(dateTo);
         if(this.dateFrom !=null && (dateTo.before(this.dateFrom) || dateTo.equals(this.dateFrom))){
             throw new IllegalArgumentException("Date cannot be before or equal the date from");
@@ -115,11 +132,13 @@ public class Flight {
         this.dateTo = dateTo;
     }
 
-    public void setAirplane(Airplane airplane) {
+    public void setAirplane(Airplane airplane)
+    {
         this.airplane = airplane;
     }
 
-    public Airplane getAirplane() {
+    public Airplane getAirplane()
+    {
         return airplane;
     }
 
@@ -135,5 +154,22 @@ public class Flight {
                     ", code=" + getCode() + '\'' +
                     '}';
     }
-}
 
+    private void checkTimeFormat(Timestamp date) {
+        // Date format checker
+        String fmt = date.toString().split(" ")[0].trim();
+
+        if (!fmt.matches("\\d{4}-\\d{2}-\\d{2}"))
+        {
+            throw new IllegalArgumentException("Date must be in YYYY-MM-DD format");
+        }
+
+        // Time format checker
+        String timeFrom = date.toString().split(" ")[1].split("\\.")[0].trim();
+
+        if (!timeFrom.matches("\\d{2}:\\d{2}:\\d{2}"))
+        {
+            throw new IllegalArgumentException("Time must be in HH:MM:SS format");
+        }
+    }
+}

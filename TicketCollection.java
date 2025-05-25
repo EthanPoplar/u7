@@ -1,63 +1,41 @@
-package fit5171.monash.edu;
+package assessment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class  TicketCollection {
-	
-	public static ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+public class TicketCollection {
 
-	public static void addTickets(ArrayList<Ticket> tickets_db) {
+	public static ArrayList<Ticket> tickets = new ArrayList<>();
+
+	public static ArrayList<Ticket> getTickets()
+	{
+		return tickets;
+	}
+
+	public static void addTickets(ArrayList<Ticket> tickets_db)
+	{
 		if (tickets_db == null) {
-			throw new IllegalArgumentException("Ticket list cannot be null");
+			throw new NullPointerException("Cannot add null ticket list");
 		}
-		ArrayList<Ticket> validTickets = new ArrayList<>();
-
-		for (Ticket ticket : tickets_db) {
-			if (ticket == null || ticket.ticketStatus()) {
-				continue;
-			}
-
-			boolean isDuplicate = false;
-
-			for (Ticket validTicket: validTickets) {
-				if (ticket.getTicket_id() == validTicket.getTicket_id()) {
-					isDuplicate = true;
-					break;
-				}
-			}
-
-			if (isDuplicate) {
-				continue;
-			}
-
-			for (Ticket exsitTicket: tickets) {
-				if (exsitTicket.getTicket_id() == ticket.getTicket_id()) {
-					isDuplicate = true;
-					break;
-				}
-			}
-			if (!isDuplicate) {
-				validTickets.add(ticket);
-			}
-		}
-		TicketCollection.tickets.addAll(validTickets);
-	}
-	
-	public static ArrayList<Ticket> getAllTickets() {
-    	return tickets;
+		TicketCollection.tickets.addAll(tickets_db);
 	}
 
+	public static void getAllTickets()
+	{
+		//display all available tickets from the Ticket collection
+		for (Ticket ticket : tickets)
+		{
+			System.out.println(ticket);
+		}
+	}
 	public static Ticket getTicketInfo(int ticket_id) {
-		if (ticket_id < 0) {
-			throw new IllegalArgumentException("Ticket id out of bounds");
-		}
-		for (Ticket ticket : tickets) {
-			if (ticket.getTicket_id() == ticket_id) {
+		//SELECT a ticket where ticket id = ticket_id
+		for (Ticket ticket : tickets)
+		{
+			if(ticket.getTicket_id() == ticket_id)
+			{
 				return ticket;
 			}
 		}
-		throw new IllegalArgumentException("Ticket with ID " + ticket_id + " not found");
+		return null;
 	}
-
 }

@@ -1,56 +1,78 @@
-package fit5171.monash.edu;
+package assessment;
 
-public class Passenger extends Person
-{
+import java.util.regex.Pattern;
+
+public class Passenger extends Person {
     private String email;
     private String phoneNumber;
     private String cardNumber;
     private int securityCode;
     private String passport;
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9]+@[A-Za-z0-9]+\\.com$");
+    private static final Pattern PASSPORT_AU = Pattern.compile("^[A-Z][0-9]{7}$");
+    private static final Pattern PASSPORT_NZ = Pattern.compile("^[A-Z]{2}[0-9]{7}$");
+    private static final Pattern PASSPORT_US = Pattern.compile("^[0-9]{9}$");
 
-    public Passenger(){
-        super();
+    public Passenger() {
+
     }
 
-    public Passenger(String firstName, String secondName, int age, String gender) {
-        super(firstName, secondName, age, gender);
-    }
-
-    public Passenger(String firstName, String secondName, int age, String gender,String email, String phoneNumber, String passport, String cardNumber,int securityCode)
+    public Passenger(String firstName, String secondName, int age, String gender, String email, String phoneNumber, String passport, String cardNumber, int securityCode)
     {
-        super(firstName,secondName,age,gender);
-        setEmail(email);
-        setSecurityCode(securityCode);
-        setCardNumber(cardNumber);
-        setPassport(passport);
-        setPhoneNumber(phoneNumber);
+        super(firstName, secondName, age, gender);
+
+        if (email == null || phoneNumber == null || passport == null || cardNumber == null || securityCode <= 0)
+        {
+            throw new IllegalArgumentException("All fields are required");
+        }
+
+        if(!phoneNumber.startsWith("+61") && !phoneNumber.startsWith("04") && !phoneNumber.startsWith("+64") && !phoneNumber.startsWith("+1"))
+        {
+            throw new IllegalArgumentException("Invalid phone number");
+        }
+
+        if(phoneNumber.startsWith("04"))
+        {
+            phoneNumber = "+61 " + phoneNumber.substring(1);
+        }
+
+        if(!EMAIL_PATTERN.matcher(email).matches())
+        {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if(!PASSPORT_NZ.matcher(passport).matches() && !PASSPORT_US.matcher(passport).matches() && !PASSPORT_AU.matcher(passport).matches())
+        {
+            throw new IllegalArgumentException("Invalid passport number format");
+        }
+
+        this.securityCode = securityCode;
+        this.cardNumber = cardNumber;
+        this.passport = passport;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
-        return this.email;
+        return email;
     }
 
-    public void setEmail(String email) {
-
-        if (email == null) {
-            throw new IllegalArgumentException("Email cannot be null");
+    public void setEmail(String email)
+    {
+        if(!EMAIL_PATTERN.matcher(email).matches())
+        {
+            throw new IllegalArgumentException("Invalid email format");
         }
 
-        email = email.trim();
-
-        System.out.println(email);
-        if (email.isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
-        else if (email.matches("^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,189}\\.[a-zA-Z]{2,}$")) {
-            this.email = email;
-        } else {
-            throw new IllegalArgumentException("Email contains invalid characters");
-        }
-           }
+        this.email = email;
+    }
 
     public String getFirstName() {
         return super.getFirstName();
+    }
+
+    public void setFirstName(String firstName) {
+        super.setFirstName(firstName);
     }
 
     public String getSecondName() {
@@ -61,24 +83,40 @@ public class Passenger extends Person
         super.setSecondName(secondName);
     }
 
-    public void setFirstName(String firstName) {
-        super.setFirstName(firstName);
-    }
-
     public String getPassport() {
         return passport;
     }
 
-    public void setGender(String gender) {
-        super.setGender(gender);
+    public void setPassport(String passport)
+    {
+        if(!PASSPORT_NZ.matcher(passport).matches() && !PASSPORT_US.matcher(passport).matches() && !PASSPORT_AU.matcher(passport).matches())
+        {
+            throw new IllegalArgumentException("Invalid passport number format");
+        }
+
+        this.passport = passport;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    public void setPhoneNumber(String phoneNumber)
+    {
+        if(!phoneNumber.startsWith("+61") && !phoneNumber.startsWith("04") && !phoneNumber.startsWith("+64") && !phoneNumber.startsWith("+1"))
+        {
+            throw new IllegalArgumentException("Invalid phone number");
+        }
+
+        this.phoneNumber = phoneNumber;
+    }
+
     public int getSecurityCode() {
         return securityCode;
+    }
+
+    public void setSecurityCode(int securityCode) {
+        this.securityCode = securityCode;
     }
 
     public String getCardNumber() {
@@ -86,48 +124,7 @@ public class Passenger extends Person
     }
 
     public void setCardNumber(String cardNumber) {
-
-        if (cardNumber == null || cardNumber.isEmpty()) {
-            throw new IllegalArgumentException("Card number cannot be empty");
-        }
-
-        cardNumber = cardNumber.replaceAll("\\s", "");
-
-        if (cardNumber.matches("^[1-9][0-9]{15}$")) {
-            this.cardNumber = cardNumber;
-        } else {
-            throw new IllegalArgumentException("Card number contains invalid characters");
-        }
-
-    }
-
-    public void setSecurityCode(int securityCode) {
-        if (securityCode < 100 || securityCode > 999) {
-            throw new IllegalArgumentException("Security code must be a 3 digit number");
-        }
-        this.securityCode = securityCode;
-    }
-
-    @Override
-    public void setAge(int age) {
-        super.setAge(age);
-    }
-
-    public void setPassport(String passport) {
-        if (passport == null) {
-            throw new IllegalArgumentException("Passport cannot be null");
-        }
-
-        passport = passport.trim().toUpperCase();
-
-        // Australia || UK || Singapore passport format
-        if (passport.matches("^[A-Z][0-9]{8}$") ||
-                passport.matches("^[0-9]{9}$|^[A-Z]{2}[0-9]{7}$") ||
-                passport.matches("^[A-Z][0-9]{7}$")) {
-            this.passport = passport;
-        } else {
-            throw new IllegalArgumentException("Passport is invalid");
-        }
+        this.cardNumber = cardNumber;
     }
 
     @Override
@@ -135,46 +132,8 @@ public class Passenger extends Person
         return super.getGender();
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) {
-            throw new IllegalArgumentException("Phone number cannot be null");
-        }
-
-        String cleanNumber = phoneNumber.replaceAll("\\s", "");
-
-        // Australian formats (local: 04XX XXX XXX, international: +614XXXXXXXX)
-        if (cleanNumber.matches("^0[4][0-9]{8}$")) {
-            // Convert Australian local format to international
-            this.phoneNumber = "61" + cleanNumber.substring(1);
-        }
-        // Already in Australian international format
-        else if (cleanNumber.matches("^61[4][0-9]{8}$")) {
-            this.phoneNumber = cleanNumber;
-        }
-
-        // Singapore formats (local: 8/9XXXXXXX, international: +658/9XXXXXXX)
-        else if (cleanNumber.matches("^[89][0-9]{7}$")) {
-            // Convert Singapore local format to international
-            this.phoneNumber = "65" + cleanNumber;
-        }
-        // Already in Singapore international format
-        else if (cleanNumber.matches("^65[89][0-9]{7}$")) {
-            this.phoneNumber = cleanNumber;
-        }
-
-        // UK formats (local: 07XXXXXXXXX, international: +447XXXXXXXXX)
-        else if (cleanNumber.matches("^0[7][0-9]{9}$")) {
-            // Convert UK local format to international
-            this.phoneNumber = "44" + cleanNumber.substring(1);
-        }
-        // Already in UK international format
-        else if (cleanNumber.matches("^44[7][0-9]{9}$")) {
-            this.phoneNumber = cleanNumber;
-        }
-
-        else {
-            throw new IllegalArgumentException("Invalid phone number format. Must be a valid Australian, Singapore, or UK mobile number.");
-        }
+    public void setGender(String gender) {
+        super.setGender(gender);
     }
 
     @Override
@@ -183,12 +142,16 @@ public class Passenger extends Person
     }
 
     @Override
-    public String toString()
-    {
-        return "Passenger{" + " Fullname= "+ super.getFirstName()+" "+super.getSecondName()+
+    public void setAge(int age) {
+        super.setAge(age);
+    }
+
+    @Override
+    public String toString() {
+        return "Passenger{" + " Fullname= " + super.getFirstName() + " " + super.getSecondName() +
                 " ,email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", passport='" + passport +
+                ", passport='" + passport + '\'' +
                 '}';
     }
 }
