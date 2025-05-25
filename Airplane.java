@@ -1,61 +1,81 @@
-package fit5171.monash.edu;
+package assessment;
 
+import java.util.LinkedHashMap;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class Airplane
-{
+public class Airplane {
     private int airplaneID;
     private String airplaneModel;
     private int businessSeatsNumber;
     private int economySeatsNumber;
     private int crewSeatsNumber;
-    private ArrayList<Seat> seats;
-//    public static ArrayList<Airplane> airplanes = new ArrayList<Airplane>();
+    private Map<Character, List<String>> seatMap;
 
-    public Airplane(int airplaneID, String airplaneModel, int businessSeatsNumber, int economySeatsNumber, int crewSeatsNumber, ArrayList<Seat> seats)
+
+    public Airplane(int airplaneID, String airplaneModel, int businessSitsNumber, int economySeatsNumber, int crewSeatsNumber)
     {
-        setSeats(seats);
         setAirplaneID(airplaneID);
         setAirplaneModel(airplaneModel);
-        setBusinessSeatsNumber(businessSeatsNumber);
+        setBusinessSeatsNumber(businessSitsNumber);
         setEconomySeatsNumber(economySeatsNumber);
-        setCrewSeatsNumber(crewSeatsNumber);
+        setCrewSeatsNumber( crewSeatsNumber);
+        buildSeatMap();
     }
 
-    public int getAirplaneID() {
+    private void buildSeatMap() {
+        seatMap = new LinkedHashMap<>();
+        for (char row = 'A'; row <= 'J'; row++) {
+            seatMap.put(row, IntStream.rangeClosed(1, 7)
+                    .mapToObj(String::valueOf).toList());
+        }
+    }
+
+    public Map<Character, List<String>> getSeatMap() {
+        return Collections.unmodifiableMap(seatMap);
+    }
+
+    public int getAirplaneID()
+    {
         return airplaneID;
     }
 
-    public void setAirplaneID(int airplaneID) {
-        if(airplaneID<0)
-        {
-            throw new IllegalArgumentException("Airplane ID cannot be negative");
+    public void setAirplaneID(int airplaneID)
+    {
+        if (airplaneID <= 0) {
+            throw new IllegalArgumentException("Airplane ID must be a positive integer.");
         }
         this.airplaneID = airplaneID;
     }
 
-    public String getAirplaneModel() {
+    public String getAirplaneModel()
+    {
         return airplaneModel;
     }
 
-    public void setAirplaneModel(String airplaneModel) {
+    public void setAirplaneModel(String airplaneModel)
+    {
+        if (airplaneModel == null || airplaneModel.trim().isEmpty()) {
+            throw new IllegalArgumentException("Airplane model is required.");
+        }
         this.airplaneModel = airplaneModel;
     }
 
-    public int getBusinessSeatsNumber() {
+    public int getBusinessSeatsNumber()
+    {
         return businessSeatsNumber;
     }
 
-    public void setBusinessSeatsNumber(int businessSeatsNumber) {
-        if(businessSeatsNumber<0 || businessSeatsNumber>80)
-        {
+    public void setBusinessSeatsNumber(int businessSeatsNumber)
+    {
+        if(businessSeatsNumber<0 || businessSeatsNumber>80){
             throw new IllegalArgumentException("Business Seats Number is between 0 and 80");
         }
         this.businessSeatsNumber = businessSeatsNumber;
     }
 
-    public int getEconomySeatsNumber() {
+    public int getEconomySeatsNumber()
+    {
         return economySeatsNumber;
     }
 
@@ -67,7 +87,8 @@ public class Airplane
         this.economySeatsNumber = economySeatsNumber;
     }
 
-    public int getCrewSeatsNumber() {
+    public int getCrewSeatNumber()
+    {
         return crewSeatsNumber;
     }
 
@@ -79,45 +100,13 @@ public class Airplane
         this.crewSeatsNumber = crewSeatsNumber;
     }
 
-    public ArrayList<Seat> getSeats() {
-        return seats;
-    }
-
-    public void setSeats(ArrayList<Seat> seats) {
-        this.seats = addSeat(seats);
-    }
-
-    private ArrayList<Seat> addSeat(ArrayList<Seat> seats) {
-        Map<String, Seat> uniqueSeatsMap = new HashMap<>();
-        for (Seat seat : seats) {
-            String hash = seat.toString();
-            if (!uniqueSeatsMap.containsKey(hash)) {
-                uniqueSeatsMap.put(hash, seat);
-            }
-        }
-        return new ArrayList<>(uniqueSeatsMap.values());
-    }
-
     public String toString()
     {
         return "Airplane{" +
                 "model=" + getAirplaneModel() + '\'' +
-                ", business Seats=" + getBusinessSeatsNumber() + '\'' +
-                ", economy Seats=" + getEconomySeatsNumber() + '\'' +
-                ", crew Seats=" + getCrewSeatsNumber() + '\'' +
+                ", business sits=" + getBusinessSeatsNumber() + '\'' +
+                ", economy sits=" + getEconomySeatsNumber() + '\'' +
+                ", crew sits=" + getCrewSeatNumber() + '\'' +
                 '}';
     }
-
-//	public static Airplane getAirPlaneInfo(int airplane_id) {
-//		for (Airplane airplane : airplanes) {
-//            if (airplane.getAirplaneID() == airplane_id) {
-//                return airplane;
-//            }
-//        }
-//		return null;
-//	}
-
-//    public static void addAirPlane(Airplane airplane) {
-//        Airplane.airplane.add(airplane);
-//    }
 }
